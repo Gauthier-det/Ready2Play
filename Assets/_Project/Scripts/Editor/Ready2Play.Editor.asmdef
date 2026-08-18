@@ -1,0 +1,22 @@
+{
+    "name": "Ready2Play.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9c99a0a6f2e624be7aea080d858380fc",
+        "GUID:fbef1244ce9d84a65bd7657beed7d42e",
+        "GUID:e8706396ee7e34c36a9b70f1581b38f7",
+        "GUID:2c77cf60e9b834e73acde577619b855e",
+        "GUID:6d67828c35b494d8ba334756ea587d5d"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

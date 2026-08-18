@@ -1,0 +1,17 @@
+{
+    "name": "Ready2Play.Systems",
+    "rootNamespace": "",
+    "references": [
+        "GUID:9c99a0a6f2e624be7aea080d858380fc",
+        "GUID:6d67828c35b494d8ba334756ea587d5d"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
