@@ -23,11 +23,26 @@ supposent "un seul joueur" de façon rigide dans les futurs scripts `Gameplay`/`
 liste de joueurs plutôt qu'une référence unique en dur), pour ne pas avoir à tout refactoriser si le
 multijoueur est ajouté plus tard.
 
+**Conflit déjà identifié** : le mécanisme "dialogue en plein écran, pause du monde" (cf. GAMEPLAY.md) ne
+fonctionne qu'en solo — une pause globale figerait aussi le deuxième joueur en coop. À revoir si le
+multijoueur se concrétise.
+
 ## 2026-08-19 — Consommables : besoin réel, mais secondaire
 
 Le système de consommables (nourriture/boisson, boosts, indices, monnaie) reste dans la vision du jeu,
 mais volontairement hors scope du vertical slice et des prochaines étapes proches. À reprendre une fois
 la boucle cœur du jeu validée.
+
+## 2026-08-20 — Piste : puzzles physiques dans les parcours
+
+Idée à garder en tête pour la suite (hors scope du vertical slice actuel) : intégrer des éléments de
+puzzle dans les parcours — déplacer une caisse pour atteindre une hauteur, un puzzle pour ouvrir une
+porte, une corde pour grimper.
+
+**Impact pressenti sur l'architecture** : le joueur reste en `CharacterController` (contrôle précis),
+les objets déplaçables (caisses) seraient en `Rigidbody` — le joueur pousserait les objets physiques via
+`OnControllerColliderHit` plutôt que d'être lui-même soumis à la physique. La corde et les puzzles de
+porte seraient probablement scriptés (pas de vraie physique) plutôt que physiques.
 
 ## Prochaine étape
 

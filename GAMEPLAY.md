@@ -24,6 +24,11 @@ un PNJ, un souvenir.
 - Une interaction peut débloquer un souvenir ou faire avancer la compréhension du secret du village.
 - Une interaction peut faire évoluer le comportement d'un PNJ par la suite (cf. STORY.md).
 
+  > ⚠️ **Valable en solo uniquement.** Une pause globale (`Time.timeScale`) ne fonctionne pas telle
+  > quelle si le mode coop à deux (cf. DECISIONS.md) se concrétise : ça figerait aussi le deuxième
+  > joueur pendant que le premier parle à un PNJ. À revoir à ce moment-là (ex : pause locale du joueur
+  > qui interagit plutôt que pause globale du monde).
+
 ## Souvenirs
 
 - Se présentent sous forme de parchemins.
