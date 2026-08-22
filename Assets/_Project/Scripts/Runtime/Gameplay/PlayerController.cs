@@ -54,7 +54,11 @@ public class PlayerController : MonoBehaviour
             _verticalVelocity = jumpForce; 
         }
 
-        _characterController.Move(moveDirection * walkSpeed * Time.deltaTime + Vector3.up * _verticalVelocity * Time.deltaTime);
+        CollisionFlags flags = _characterController.Move(moveDirection * walkSpeed * Time.deltaTime + Vector3.up * _verticalVelocity * Time.deltaTime);
+        if ((flags & CollisionFlags.Above) != 0)
+        {
+            _verticalVelocity = -2f; 
+        }
     }
 
     // Autorise le mouvement uniquement en exploration ou en parcours.
