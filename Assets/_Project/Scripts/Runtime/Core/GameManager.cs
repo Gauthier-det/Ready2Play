@@ -5,7 +5,7 @@ public class GameManager : MonoBehaviour
 {
     private static GameManager _instance;
 
-    public GameState CurrentState { get; private set; } = GameState.MainMenu;
+    public GameState CurrentState { get; private set; } = GameState.FreeExploration;
     public event Action<GameState> OnStateChanged;
 
     public static GameManager Instance { 

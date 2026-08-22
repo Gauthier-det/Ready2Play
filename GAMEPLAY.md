@@ -16,6 +16,10 @@ un PNJ, un souvenir.
 - **Vue 3e personne** pendant les parcours (caméra derrière/à côté du personnage).
 - Déplacement en marche uniquement pour le vertical slice (pas de course/stamina pour l'instant — lié aux
   consommables santé, hors scope).
+- Le jeu est un **plateformer** : le saut est une mécanique centrale, pas secondaire.
+  - Saut à **hauteur fixe** (pas de saut chargé/variable pour le vertical slice).
+  - **Un seul saut** (pas de double saut pour l'instant — cf. hors scope).
+  - **Contrôle aérien** : le joueur peut rediriger son mouvement horizontal pendant qu'il est en l'air.
 
 ## Dialogues et interactions
 
@@ -60,5 +64,6 @@ un PNJ, un souvenir.
 - Deuxième protagoniste / coopération à deux (piste multijoueur, cf. DECISIONS.md).
 - Mine (2e partie de l'histoire).
 - Consommables et économie (nourriture, boissons, boosts, monnaie).
+- Double saut (pensé comme débloqué par un futur consommable, pas disponible de base).
 - Course/stamina (liée aux consommables santé).
 - Sauvegarde libre (checkpoints seulement pour l'instant).
