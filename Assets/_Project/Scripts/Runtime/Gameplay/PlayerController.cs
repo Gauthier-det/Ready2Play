@@ -9,11 +9,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpForce;
+    [SerializeField] private float lethalVelocityThreshold = -6f; 
+
 
     private CharacterController _characterController;
     private PlayerInput _playerInput;
+    private PlayerRespawn _playerRespawn;
     private Camera _mainCamera;
-
+    private float _voidThreshold = -2f; 
+    
     private float _verticalVelocity;
     private bool _canMove;
 
@@ -22,6 +26,7 @@ public class PlayerController : MonoBehaviour
     {
         _characterController = GetComponent<CharacterController>();
         _playerInput = GetComponent<PlayerInput>();
+        _playerRespawn = GetComponent<PlayerRespawn>();
         _mainCamera = Camera.main;
     }
 
@@ -58,6 +63,21 @@ public class PlayerController : MonoBehaviour
         if ((flags & CollisionFlags.Above) != 0)
         {
             _verticalVelocity = -2f; 
+        }
+
+        if ((flags & CollisionFlags.Below) != 0) // Si le joueur tombe de trop haut
+        {
+            if (_verticalVelocity < lethalVelocityThreshold)
+            {
+                Debug.Log("t mors");
+                _playerRespawn.Respawn(PlayerRespawn.RespawnMode.Fall);
+            }
+        }
+
+        if (transform.position.y < _voidThreshold && GameManager.Instance.CurrentState != GameState.Respawning) // Si le joueur tombe dans le vide
+        {
+            _verticalVelocity = 0f; 
+            _playerRespawn.Respawn(PlayerRespawn.RespawnMode.Void);
         }
     }
 
