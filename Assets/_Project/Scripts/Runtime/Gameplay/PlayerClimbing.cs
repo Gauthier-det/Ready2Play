@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections;
 
 [RequireComponent(typeof(CharacterController))]
 [RequireComponent(typeof(PlayerInput))]
@@ -51,17 +52,22 @@ public class SimpleWallClimber : MonoBehaviour
         }
         else
         {
-            // Si on ne détecte plus de mur (on est arrivé en haut) OU qu'on arrête d'avancer
             if (_isClimbing)
             {
-                // NOUVEAU : Si on arrête de détecter le mur mais qu'on avance toujours, on se hisse !
                 if (input.y > 0.1f)
                 {
-                    VaultLedge();
+                    // On lance le hissage fluide (qui appellera StopClimbing à la fin)
+                    StartCoroutine(VaultLedgeRoutine());
                 }
-
-                StopClimbing();
-                Debug.Log("T'arrêtes de monter là");
+                else
+                {
+                    // Si le joueur a lâché Z, on lâche juste le mur normalement
+                    StopClimbing();
+                }
+                
+                // On passe isClimbing à false IMMÉDIATEMENT pour que le script arrête d'appeler l'escalade,
+                // même si StopClimbing sera réellement géré par la Coroutine.
+                _isClimbing = false; 
             }
         }
     }
@@ -103,15 +109,31 @@ public class SimpleWallClimber : MonoBehaviour
         }
     }
 
-    private void VaultLedge()
+    private IEnumerator VaultLedgeRoutine()
     {
-        // 1. On donne un coup de boost vers le haut pour que les pieds dépassent le rebord du mur
+        // 1. On calcule la hauteur totale à franchir
         float heightToClear = (_characterController.height / 2f) + 0.6f;
-        _characterController.Move(Vector3.up * heightToClear);
+    
+        // 2. On définit en combien de temps (en secondes) le personnage doit se hisser
+        float vaultDuration = 0.2f; 
+        float timePassed = 0f;
 
-        // 2. On pousse légèrement le personnage en avant pour le poser de manière sécurisée sur le toit
-        _characterController.Move(transform.forward * 0.5f);
+        // 3. La boucle fluide : tant qu'on n'a pas atteint la durée, on monte un peu à chaque frame
+        while (timePassed < vaultDuration)
+        {
+            // On calcule la petite portion de hauteur à monter pour cette frame précise
+            float climbStep = (heightToClear / vaultDuration) * Time.deltaTime;
         
-        Debug.Log("Hissage réussi !");
+            _characterController.Move(Vector3.up * climbStep);
+        
+            timePassed += Time.deltaTime;
+        
+            // On dit à Unity : "Pause la fonction ici et reprends à la frame suivante"
+            yield return null; 
+        }
+
+        // 4. Une fois arrivé en haut, on réactive le script de base
+        // C'est SEULEMENT maintenant que la touche Z du joueur va le pousser en avant sur le toit
+        StopClimbing(); 
     }
 }
