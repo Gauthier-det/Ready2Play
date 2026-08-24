@@ -11,7 +11,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpForce;
     [SerializeField] private float lethalVelocityThreshold = -6f; 
 
-
     private CharacterController _characterController;
     private PlayerInput _playerInput;
     private PlayerRespawn _playerRespawn;
@@ -21,6 +20,9 @@ public class PlayerController : MonoBehaviour
     private float _verticalVelocity;
     private bool _canMove;
 
+    private Animator _animator;
+
+
     // Récupère les références aux composants et à la caméra principale.
     private void Awake()
     {
@@ -28,6 +30,8 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<PlayerInput>();
         _playerRespawn = GetComponent<PlayerRespawn>();
         _mainCamera = Camera.main;
+
+        _animator = GetComponentInChildren<Animator>();
     }
 
     // S'abonne aux changements d'état du jeu 
@@ -78,6 +82,11 @@ public class PlayerController : MonoBehaviour
         {
             _verticalVelocity = 0f; 
             _playerRespawn.Respawn(PlayerRespawn.RespawnMode.Void);
+        }
+
+        if (_animator != null)
+        {
+            _animator.SetFloat("Speed", moveDirection.magnitude);
         }
     }
 
