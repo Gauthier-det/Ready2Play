@@ -13,6 +13,8 @@ public class FallingPlatform : MonoBehaviour
         
     private Vector3 _startPosition;
     private Quaternion _startRotation;
+
+    private Coroutine _fallCoroutine;
     
     private void OnEnable() 
     {
@@ -37,7 +39,7 @@ public class FallingPlatform : MonoBehaviour
         if (other.gameObject.layer == playerLayer && _isTriggered == false)
         {
 		        _isTriggered = true;
-            StartCoroutine(FallSequence());
+            _fallCoroutine = StartCoroutine(FallSequence());
         }
     }
     
@@ -47,10 +49,19 @@ public class FallingPlatform : MonoBehaviour
 		transform.rotation= _startRotation;
 		
 		_rigidBody.isKinematic = true;
-		_rigidBody.linearVelocity = Vector3.zero;
-		_rigidBody.angularVelocity = Vector3.zero;
-		
+
+        if (_rigidBody.isKinematic == false)
+        {
+            _rigidBody.linearVelocity = Vector3.zero;
+            _rigidBody.angularVelocity = Vector3.zero;
+        }
 		_isTriggered = false;
+
+        if (_fallCoroutine != null)
+        {
+            StopCoroutine(_fallCoroutine);
+            _fallCoroutine = null;
+        }
 	}
 		
     private IEnumerator FallSequence()
