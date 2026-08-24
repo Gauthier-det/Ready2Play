@@ -44,7 +44,10 @@ public class PlayerController : MonoBehaviour
     // Se désabonne pour éviter les fuites mémoire.
     private void OnDisable()
     {
-        GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.OnStateChanged -= HandleStateChanged;
+        }
     }
 
     // Boucle principale : lit l'input, oriente le perso et le déplace si autorisé.
