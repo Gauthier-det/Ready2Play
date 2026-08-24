@@ -1,4 +1,6 @@
 using UnityEngine;
+using System;
+
 
 public class PlayerRespawn : MonoBehaviour
 {
@@ -9,6 +11,8 @@ public class PlayerRespawn : MonoBehaviour
 
     private CharacterController _characterController;
     private bool _isRespawning;
+
+    public static Action OnPlayerRespawn;
 
     public enum RespawnMode
     {
@@ -24,6 +28,8 @@ public class PlayerRespawn : MonoBehaviour
     public void Respawn(RespawnMode mode)
     {
         if (_isRespawning) return;
+
+        OnPlayerRespawn?.Invoke();
 
         _isRespawning = true;
         GameManager.Instance.SetState(GameState.Respawning);
