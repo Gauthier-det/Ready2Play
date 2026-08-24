@@ -4,10 +4,13 @@ using System.Collections;
 public class FallingPlatform : MonoBehaviour
 {
     [SerializeField] private float timeBeforeCollapse = 3f;
+    [SerializeField] private float magnitude = 0.0001f;
+
 
     private Rigidbody _rigidBody;
     private bool _isTriggered = false;
     private int playerLayer = 3; // Layer du joueur
+        
     private Vector3 _startPosition;
     private Quaternion _startRotation;
     
@@ -38,21 +41,33 @@ public class FallingPlatform : MonoBehaviour
         }
     }
     
-		private void ResetPlatform()
-		{
-				transform.position = _startPosition;
-				transform.rotation= _startRotation;
-				
-				_rigidBody.isKinematic = true;
-				_rigidBody.linearVelocity = Vector3.zero;
-				_rigidBody.angularVelocity = Vector3.zero;
-				
-				_isTriggered = false;
-		}
+	private void ResetPlatform()
+	{
+		transform.position = _startPosition;
+		transform.rotation= _startRotation;
+		
+		_rigidBody.isKinematic = true;
+		_rigidBody.linearVelocity = Vector3.zero;
+		_rigidBody.angularVelocity = Vector3.zero;
+		
+		_isTriggered = false;
+	}
 		
     private IEnumerator FallSequence()
     {
-        yield return new WaitForSeconds(timeBeforeCollapse);
+        //yield return new WaitForSeconds(timeBeforeCollapse);
+        float elasped = 0.0f;
+        while (elasped < timeBeforeCollapse)
+        {
+            float x = Random.Range(-1f, 1f) * magnitude;
+            float y = Random.Range(-1f, 1f) * magnitude;
+
+            transform.position = new Vector3(_startPosition.x + x, _startPosition.y + y, _startPosition.z);
+            elasped += Time.deltaTime;
+            yield return null;
+        }
+
+        transform.position = _startPosition;
         _rigidBody.isKinematic = false;
     }
     
