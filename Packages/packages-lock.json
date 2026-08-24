@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.kinematicsoup.scenefusion2": {
+      "version": "https://github.com/KinematicSoup/Releases.git?path=/SceneFusion/2.0.5",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "1953eddc6075078f791882f209e2e6972a0f6a88"
+    },
     "com.unity.ai.navigation": {
       "version": "2.0.14",
       "depth": 0,
