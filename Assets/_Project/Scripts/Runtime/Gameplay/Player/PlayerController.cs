@@ -9,7 +9,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpForce;
-    [SerializeField] private float lethalVelocityThreshold = -6f; 
+    [SerializeField] private float lethalVelocityThreshold = -6f;   
+
+    [SerializeField] private float maxGrappleDistance = 40f;
+    [SerializeField] private float climbSpeed = 2f;
+    [SerializeField] private LayerMask grappleLayer;
+    [SerializeField] private LineRenderer lineRenderer;
 
     private CharacterController _characterController;
     private PlayerInput _playerInput;
@@ -21,6 +26,11 @@ public class PlayerController : MonoBehaviour
     private bool _canMove;
 
     private Animator _animator;
+
+
+    private bool _isGrappling;
+    private Vector3 _grapplePoint;
+    private float _ropeLength;
 
 
     // Récupère les références aux composants et à la caméra principale.
@@ -55,6 +65,101 @@ public class PlayerController : MonoBehaviour
     {
         if (!_canMove) return;
 
+        HandleGrappleInput();
+
+        if(_isGrappling == true)
+        {
+            HandleGrappleMovement();
+        }
+        else
+        {
+            HandleNormalMovement();
+        }
+
+    }
+
+    private void HandleGrappleInput()
+    {
+        if (_playerInput.actions["Grapple"].WasPressedThisFrame())
+        {
+            if (_isGrappling)
+            {
+                _isGrappling = false;
+                if (lineRenderer != null)
+                {
+                    lineRenderer.enabled = false;
+                }
+                _verticalVelocity = jumpForce * 0.5f;
+            }
+            else
+            {
+                Vector3 rayOrigin = _mainCamera.transform.position;
+                Vector3 rayDirection = _mainCamera.transform.forward;
+
+                if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, maxGrappleDistance, grappleLayer))
+                {
+                    _isGrappling = true;
+                    _grapplePoint = hit.point;
+                    _ropeLength = Vector3.Distance(transform.position, _grapplePoint);
+
+                    if (lineRenderer != null) 
+                    {
+                        lineRenderer.enabled = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private void HandleGrappleMovement()
+    {
+        Debug.Log("Bien appelé aussi");
+
+        if (lineRenderer != null)
+        {
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, _grapplePoint);
+        }
+
+        float verticalInput = ReadMoveInput().y;
+        if (verticalInput > 0)
+        {
+            _ropeLength -= climbSpeed * Time.deltaTime;
+        }
+        else if (verticalInput < 0)
+        {
+            _ropeLength += climbSpeed * Time.deltaTime;
+        }
+
+        if (_ropeLength < 1f)
+        {
+            _ropeLength = 1f;
+        }
+
+        float currentDistance = Vector3.Distance(transform.position, _grapplePoint);
+
+        if (currentDistance > _ropeLength)
+        {
+            Vector3 directionToGrapple = (_grapplePoint - transform.position).normalized;
+            Vector3 tensionForce = directionToGrapple * (currentDistance - _ropeLength);
+
+            _characterController.Move(tensionForce);
+            _verticalVelocity = 0f;
+
+            float horizontalInput = ReadMoveInput().x;
+            Vector3 swingDirection = _mainCamera.transform.right;
+
+            _characterController.Move(swingDirection * horizontalInput * walkSpeed * Time.deltaTime); 
+        }
+        else
+        {
+            _verticalVelocity -= gravity * Time.deltaTime;
+            _characterController.Move(Vector3.up * _verticalVelocity * Time.deltaTime);
+        }
+    }
+
+    private void HandleNormalMovement() //Contient tout l'ancien update
+    {
         Vector2 input = ReadMoveInput();
         Vector3 moveDirection = ComputeCameraRelativeDirection(input);
 
@@ -143,5 +248,5 @@ public class PlayerController : MonoBehaviour
         {
             _verticalVelocity -= gravity * Time.deltaTime;
         }
-    }
+    } 
 }
