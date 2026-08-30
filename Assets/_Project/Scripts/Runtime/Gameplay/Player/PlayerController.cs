@@ -9,7 +9,18 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpForce;
-    [SerializeField] private float lethalVelocityThreshold = -6f; 
+    [SerializeField] private float lethalVelocityThreshold = -6f;   
+
+    [SerializeField] private float maxGrappleDistance = 40f;
+    [SerializeField] private float climbSpeed = 2f;
+    [SerializeField] private LayerMask grappleLayer;
+    [SerializeField] private LineRenderer lineRenderer;
+    [SerializeField] private float swingForce = 15f; 
+    [SerializeField] private float drag = 0.5f; 
+    [SerializeField] private float ropeShootSpeed = 80f; 
+
+    private Vector3 _grappleVelocity; 
+    private Vector3 _currentRopeEnd;
 
     private CharacterController _characterController;
     private PlayerInput _playerInput;
@@ -21,6 +32,11 @@ public class PlayerController : MonoBehaviour
     private bool _canMove;
 
     private Animator _animator;
+
+
+    private bool _isGrappling;
+    private Vector3 _grapplePoint;
+    private float _ropeLength;
 
 
     // Récupère les références aux composants et à la caméra principale.
@@ -55,6 +71,121 @@ public class PlayerController : MonoBehaviour
     {
         if (!_canMove) return;
 
+        HandleGrappleInput();
+
+        if(_isGrappling == true)
+        {
+            HandleGrappleMovement();
+        }
+        else
+        {
+            HandleNormalMovement();
+        }
+    }
+
+    private void HandleGrappleInput()
+    {
+        if (_playerInput.actions["Grapple"].WasPressedThisFrame())
+        {
+            if (_isGrappling) 
+            {
+                _isGrappling = false;
+                if (lineRenderer != null) lineRenderer.enabled = false;
+                
+                _verticalVelocity = _grappleVelocity.y + (jumpForce * 0.5f);
+            }
+            else
+            {
+                Vector3 rayOrigin = _mainCamera.transform.position;
+                Vector3 rayDirection = _mainCamera.transform.forward;
+
+
+                Debug.DrawRay(rayOrigin, rayDirection * maxGrappleDistance, Color.red, 2f);
+                if (Physics.SphereCast(rayOrigin, 1.5f, rayDirection, out RaycastHit hit, maxGrappleDistance, grappleLayer))
+                {
+                    _isGrappling = true;
+                    _grapplePoint = hit.point;
+                    _ropeLength = Vector3.Distance(transform.position, _grapplePoint);
+
+                    _currentRopeEnd = transform.position; // La corde part du joueur
+                    _grappleVelocity = Vector3.zero; // On remet l'élan à zéro
+
+                    if (lineRenderer != null) 
+                    {
+                        lineRenderer.enabled = true;
+                    }
+                }
+            }
+        }
+    }
+
+    private void HandleGrappleMovement()
+    {
+        Debug.Log("Bien appelé aussi");
+
+        if (lineRenderer != null)
+        {
+            _currentRopeEnd = Vector3.MoveTowards(_currentRopeEnd, _grapplePoint, ropeShootSpeed * Time.deltaTime);
+
+            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(1, _grapplePoint);
+        }
+
+        if (_playerInput.actions["Jump"].IsPressed())
+        {
+            _ropeLength -= climbSpeed * Time.deltaTime;
+        }
+        else if (_playerInput.actions["Sprint"].IsPressed()) 
+        {
+            _ropeLength += climbSpeed * Time.deltaTime; 
+        }
+
+        if (_ropeLength < 1f) _ropeLength = 1f;
+        if (_ropeLength > maxGrappleDistance) _ropeLength = maxGrappleDistance;
+
+        Vector3 ropeDirection = (transform.position - _grapplePoint).normalized;
+        float currentDistance = Vector3.Distance(transform.position, _grapplePoint);
+
+        // 1. Ajouter la gravité
+        _grappleVelocity += Vector3.down * gravity * Time.deltaTime; 
+
+        // 2. Ajouter la force du joueur (ZQSD)
+        Vector2 input = ReadMoveInput();
+        Vector3 swingDirection = ComputeCameraRelativeDirection(input);
+        _grappleVelocity += swingDirection * swingForce * Time.deltaTime; 
+
+        // 3. Ajouter la friction (Résistance de l'air)
+        _grappleVelocity -= _grappleVelocity * drag * Time.deltaTime; 
+
+        // 4. La contrainte de la corde (Le Balancier)
+        if (currentDistance >= _ropeLength)
+        {
+            // La magie des maths : Projeter la vélocité sur la tangente
+            _grappleVelocity = Vector3.ProjectOnPlane(_grappleVelocity, ropeDirection);
+
+            // Sécurité : Ramener le joueur s'il dépasse la longueur de la corde
+            Vector3 idealPosition = _grapplePoint + ropeDirection * _ropeLength;
+            Vector3 tensionCorrection = idealPosition - transform.position;
+            _characterController.Move(tensionCorrection);
+        }
+
+        // 5. Appliquer le mouvement final
+        _characterController.Move(_grappleVelocity * Time.deltaTime);
+
+        if (swingDirection.sqrMagnitude > 0.1f) 
+        {
+            RotateTowards(swingDirection);
+        }
+        else if (_grappleVelocity.sqrMagnitude > 0.1f)
+        {
+            Vector3 lookDir = _grappleVelocity;
+            lookDir.y = 0; // On garde le perso droit
+            RotateTowards(lookDir.normalized);
+        }
+    }
+
+    private void HandleNormalMovement() //Contient tout l'ancien update
+    {
         Vector2 input = ReadMoveInput();
         Vector3 moveDirection = ComputeCameraRelativeDirection(input);
 
@@ -144,4 +275,12 @@ public class PlayerController : MonoBehaviour
             _verticalVelocity -= gravity * Time.deltaTime;
         }
     }
+
+    private void OnDrawGizmosSelected()
+    {
+        // On choisit la couleur jaune
+        Gizmos.color = Color.yellow;
+        // On dessine une sphère vide autour du joueur, de la taille de maxGrappleDistance
+        Gizmos.DrawWireSphere(transform.position, maxGrappleDistance);
+    } 
 }
