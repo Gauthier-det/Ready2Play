@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a03950d2a302540959e35273aec96f26, type: 3}
+  m_Name: PNJ1-V2
+  m_EditorClassIdentifier: Ready2Play.Gameplay::DialogContainer
+  entryPoints:
+  - condition:
+      type: 1
+      value: 1_1_3_A
+      values: []
+    targetNodeId: 1_1_4
+  - condition:
+      type: 2
+      value:
+      values:
+      - 1_1_1_A
+    targetNodeId: 1_1_5
+  - condition:
+      type: 0
+      value:
+      values: []
+    targetNodeId: 1_1_6
+  nodes:
+  - id: 1_1_4
+    text: "Tiens, te revoil\xE0 ! Tu es toujours curieux de ce village ?"
+    choices:
+    - choiceCode: 1_1_4_A
+      text: ...
+      nextNodeId:
+      condition:
+        type: 0
+        value:
+        values: []
+  - id: 1_1_5
+    text: Alors, aventurier, comment se passe l'exploration ?
+    choices:
+    - choiceCode: 1_1_5_A
+      text: ...
+      nextNodeId:
+      condition:
+        type: 0
+        value:
+        values: []
+  - id: 1_1_6
+    text: On ne s'est jamais croisés, non ?
+    choices:
+    - choiceCode: 1_1_6_A
+      text: ...
+      nextNodeId:
+      condition:
+        type: 0
+        value:
+        values: []
