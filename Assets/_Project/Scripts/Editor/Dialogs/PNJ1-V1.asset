@@ -1,0 +1,58 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a03950d2a302540959e35273aec96f26, type: 3}
+  m_Name: PNJ1-V1
+  m_EditorClassIdentifier: Ready2Play.Gameplay::DialogContainer
+  entryPoints:
+  - condition:
+      type: 0
+      value:
+      values: []
+    targetNodeId: 1_1_1
+  nodes:
+  - id: 1_1_1
+    text: 'Salut jeune voyageur, que fais tu ici ? '
+    choices:
+    - choiceCode: 1_1_1_A
+      text: Je visite le coin, je suis aventurier.
+      nextNodeId: 1_1_2
+      condition:
+        type: 0
+        value: 
+        values: []
+    - choiceCode: 1_1_1_B
+      text: Je voudrais en savoir plus sur ce village
+      nextNodeId: 1_1_3
+      condition:
+        type: 0
+        value: 
+        values: []
+  - id: 1_1_2
+    text: D'accord, profite bien.
+    choices:
+    - choiceCode: 1_1_2_A
+      text: ...
+      nextNodeId: 
+      condition:
+        type: 0
+        value: 
+        values: []
+  - id: 1_1_3
+    text: Mhhhhh.....
+    choices:
+    - choiceCode: 1_1_3_A
+      text: ...
+      nextNodeId: 
+      condition:
+        type: 0
+        value: 
+        values: []

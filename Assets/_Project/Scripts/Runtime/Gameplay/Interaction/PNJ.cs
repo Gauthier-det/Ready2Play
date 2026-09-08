@@ -1,7 +1,9 @@
 using UnityEngine;
 
 public class PNJ : MonoBehaviour, IInteractable {
-    [SerializeField] private string dialogText;
+    [SerializeField] private string npcId;
+    [SerializeField] private int order = 1;
+    [SerializeField] private DialogContainer dialogContainer;
     [SerializeField] private bool isHighlighted;
     [SerializeField] private Color highlightColor = Color.yellow;
 
@@ -14,9 +16,26 @@ public class PNJ : MonoBehaviour, IInteractable {
     }
 
     public void Interact() {
-        Debug.Log($"Interacting with PNJ: {dialogText}");
-        GameManager.Instance.SetState(GameState.Dialog);
-        Debug.Log("Bah oilà t'es coincé dans le mode dialog mon con");
+        bool previousOrderDone = order <= 1 || NpcMemoryService.Instance.HasVisitedOrder(npcId, order - 1);
+        bool alreadyVisited = previousOrderDone && NpcMemoryService.Instance.HasVisitedOrder(npcId, order);
+
+        if (previousOrderDone) {
+            NpcMemoryService.Instance.MarkOrderVisited(npcId, order);
+            DestroyEarlierVisitedVersions();
+        }
+
+        DialogRunner.Instance.StartDialog(npcId, dialogContainer, alreadyVisited);
+    }
+
+    private void DestroyEarlierVisitedVersions() {
+        PNJ[] allPnjs = FindObjectsByType<PNJ>(FindObjectsSortMode.None);
+        foreach (PNJ other in allPnjs) {
+            if (other == this) continue;
+            if (other.npcId != npcId) continue;
+            if (other.order >= order) continue;
+            if (!NpcMemoryService.Instance.HasVisitedOrder(npcId, other.order)) continue;
+            Destroy(other.gameObject);
+        }
     }
 
     public void SetHighlighted(bool highlighted) {
