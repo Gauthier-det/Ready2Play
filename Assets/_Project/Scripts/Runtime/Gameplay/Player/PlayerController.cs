@@ -9,9 +9,10 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float rotationSpeed;
     [SerializeField] private float gravity;
     [SerializeField] private float jumpForce;
-    [SerializeField] private float lethalVelocityThreshold = -6f;   
+    [SerializeField] private float lethalVelocityThreshold = -10f;   
 
     [SerializeField] private float maxGrappleDistance = 40f;
+    [SerializeField] private float maxGrappleSpeed = 35f;
     [SerializeField] private float climbSpeed = 2f;
     [SerializeField] private LayerMask grappleLayer;
     [SerializeField] private LineRenderer lineRenderer;
@@ -167,6 +168,11 @@ public class PlayerController : MonoBehaviour
             Vector3 idealPosition = _grapplePoint + ropeDirection * _ropeLength;
             Vector3 tensionCorrection = idealPosition - transform.position;
             _characterController.Move(tensionCorrection);
+        }
+
+        if (_grappleVelocity.magnitude > maxGrappleSpeed)
+        {
+            _grappleVelocity = _grappleVelocity.normalized * maxGrappleSpeed;
         }
 
         // 5. Appliquer le mouvement final
